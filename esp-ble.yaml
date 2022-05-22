@@ -1,0 +1,58 @@
+esphome:
+  name: ble-esp
+
+esp32:  # Specify controller used
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota: # "over the air" for updates without the need to plug into a computer
+  password: "47945f555b1a5e996b5aa5bd02baa7fd"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Fallback Hotspot"
+    password: "5cAiQp64ksh0"
+
+captive_portal:  # Enabling to change settings in the Fallback hotspot
+
+esp32_ble_tracker:  # Component needed to connect to Xiaomi BLE
+
+sensor:  # Configuration to connect to two of the temperature and humidity measurement devices
+  - platform: xiaomi_lywsd03mmc
+    mac_address: "A4:C1:38:32:6C:43"
+    bindkey: "eef418daf699a0c188f3bfd17e4565d9"
+    temperature:
+      name: "Badezimmer Temperatur"
+    humidity:
+      name: "Badezimmer Luftfeuchtigkeit"
+    battery_level:
+      name: "Badezimmer Batterielever"
+      
+  - platform: xiaomi_lywsd03mmc
+    mac_address: "A4:C1:38:32:29:F9"
+    bindkey: "eef418daf699a0c188f3bfd17e4565d9"
+    temperature:
+      name: "Badezimmer oben Temperatur"
+    humidity:
+      name: "Badezimmer oben Luftfeuchtigkeit"
+    battery_level:
+      name: "Badezimmer oben Batterielevel"
+      
+  - platform: dht
+    pin: 023
+    temperature:
+      name: "Jonathans Zimmer Temperatur"
+    humidity:
+      name: "Jonathans Zimmer Luftfeuchtigkeit"
+    update_interval: 60s
