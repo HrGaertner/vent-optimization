@@ -145,16 +145,23 @@ function vent() {
     var func = humidity_over_time_vent(h0, t0, localStorage["t_out"], h_out, JSON.parse(localStorage["constants_vent"]));
     plot_graph(x_and_y_values(func, 0, 40, 1), '.vent')
     i = 0;
-    if (h_out < 65){
+    if (!func(i)){
+        alert("Etwas ist schief gegangen, wahrscheinlich müssen Sie ihre Daten unter Einstellungen eingeben")
+        throw new Error("Returned null")
+    }
+    if (h_out >= 65){
     while (true){
         if (func(i) < 65){
             vent_time = i;
             break;
         }
+        if (i >1000){
+            document.getElementById("vent_time").textContent = "Die Luftfeuchtigkeit fällt auf absehbare Zeit nicht unter  Werte";
+        }
         i++;
     }document.getElementById("vent_time").textContent = "Sie sollten: " + vent_time + " min lüften.";
     } else{
-        document.getElementById("vent_time").textContent = "Die Luftfeuchtigkeit fällt auf absehbare Zeit nicht unter ungefährliche Werte";
+        document.getElementById("vent_time").textContent = "Die Luftfeuchtigkeit fällt auf absehbare Zeit nicht unter möglicherweise schimmelbildende Werte";
     }
     
 }
