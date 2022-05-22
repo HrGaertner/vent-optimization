@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lüftungsoptimierung</title>
+    <meta charset="utf-8">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png"> <!-- Favicons-->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/favicons/site.webmanifest">
+    <link rel="mask-icon" href="/favicons/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="/favicons/favicon.ico">
+    <meta name="msapplication-TileColor" content="#2d89ef">
+    <meta name="msapplication-config" content="/favicons/browserconfig.xml">
+    <meta name="theme-color" content="#fbf3f3">
+    <link rel="stylesheet" href="css/chartist.min.css" />
+    <link rel="stylesheet" href="css/vital.min.css" /> <!-- CSS Framework-->
+    <script src="js/app.js"></script>
+    <script>
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/js/sw.js');
+        };
+    </script>
+</head>
+
+<body>
+    <div class="autogrid tabs-block" id="navigation">
+        <!-- Navigation-->
+        <div class="col here">
+            <a href="#">Prognose</a>
+        </div>
+        <div class="col">
+            <a href="train.html">Anpassen</a>
+        </div>
+        <div class="col">
+            <a href="settings.html"><img src="icons/settings.svg"></a>
+        </div>
+    </div>
+    <!-- Only shwo the following notice if local storage is empty -->
+    <div class="row notice" id="welcome-notice" style="display: none">
+        <div class="section">
+            <div class="notice-message">
+                <div class="notice-text">Bitte legen sie zuerst die Basisparameter unter Einstellungen fest.</div>
+                <div class="notice-dismiss"  onclick="document.getElementById('welcome-notice').remove();">
+                    <img src="icons/close-outline.svg" alt="Icon close outline">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        if (localStorage.length == 0){
+            document.getElementById("welcome-notice").style.display = "block";
+            set_defaults();
+        }
+    </script>
+    <div class="row">
+        <div class="section">
+            <h1>Vorraussage für das Lüften</h1>
+            <div class="full-width-form">
+                <div class="col"><label><input placeholder="Luftfeuchtigkeit" id="h0" type="number"></label></div>
+                <div class="col"><label><input placeholder="Temperatur" id="t0" type="number"></label></div>
+                <div class="col"><label><input type="checkbox"  onclick="toggle_element_vis('f_weather')">Eigene Wetterdaten nutzen  </label></div>
+                <div class="col"><label><input class="btn" type="submit" value="Berechnen" onclick="vent()"></label></div>
+            </div>
+            <div class="full-width-form" id="f_weather" style="display: none;">
+                <p>Wetterdaten</p>
+                <div class="col"><label><input onchange="setWithExpiry('h_out', document.getElementById('h_out').value)" placeholder="Luftfeuchtigkeit" id="h_out" type="number"></label></div>
+                <div class="col"><label><input onchange="localStorage['t_out'] = document.getElementById('t_out').value" placeholder="Temperatur" id="t_out" type="number"></label></div>
+            </div>
+            <div class="vent ct-octave"></div>
+            <p>x-Achse: Zeit in Minuten | y-Achse: relative Luftfeuchtigkeit in %</p>
+            <p id="vent_time"></p>
+        </div>
+    </div>
+    <script src="js/chartist.min.js"></script>
+</body>
+
+</html>
