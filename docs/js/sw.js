@@ -25,6 +25,7 @@ const PRECACHE_URLS = [
   '../favicons/favicon-32x32.png',
   '../favicons/favicon-16x16.png',
   '../css/vital.min.css',
+  '../css/chartist.min.js',
   'app.js',
   'chartist.min.js',
   'optimization.js'
