@@ -159,10 +159,8 @@ function vent() {
 
     //getting vent time
     var answer = "Die Luftfeuchtigkeit fällt auf absehbare Zeit nicht unter möglicherweise schimmelbildende Werte";
-    alert(h_out);
     if (h_out < 65){ //65 instead of 70 as a safety buffer
     for (i = 1; i<1000;i++){
-        alert(func(i))
         if (func(i) < 65){
             answer = "Sie sollten: " + i + " min lüften.";
             break;
