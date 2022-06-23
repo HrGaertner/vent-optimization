@@ -1,5 +1,5 @@
 function set_defaults() {
-    localStorage["constants_vent"] = JSON.stringify([1.0, -1.0, 3.0, 4.0,5.0,3.5, 1.0]);
+    localStorage["constants_vent"] = JSON.stringify([10.22982207, 39.72135881,  0.2509737 , 0.72841352, 11.27604132,  8.1594712 ,  6.73223487]);
 }
 
 function toggle_element_vis(elem){
@@ -11,7 +11,7 @@ function toggle_element_vis(elem){
     }
 }
 
-function fetch_met_no_and_cache(){
+function fetch_met_no_and_cache(){ //To fetch the weather data from the internet
     if (! localStorage.getItem("lat") || !localStorage.getItem("lon")){
         alert("Bitte geben Sie ihren Standort in den Einstellungen für die Wetterdaten ein.");
         throw new Error("Can not get weather data!")
@@ -40,7 +40,9 @@ function fetch_met_no_and_cache(){
     });
 }
 
-//The concept of the following to function comes from https://www.sohamkamani.com/blog/javascript-localstorage-with-ttl-expiry/
+
+//To comply with the terms of met.no one has to cache the values to reduce load on their servers. The following two function do this while assuring to get new data if necessary
+//The concept of the following two function comes from https://www.sohamkamani.com/blog/javascript-localstorage-with-ttl-expiry/
 function setWithExpiry(key, value, ttl=3600000) {
 	const now = new Date()
 
@@ -82,20 +84,19 @@ function import_settings(File) {
     };
 }
 
-function to_absolute(h, t) {
-    C_2 = 2.53 * 1000000000;
-    L = 2.501 * 1000000;
-    R_w = 461.5;
-    e_s =  C_2* Math.exp( (-L)/R_w/(t+273,15));
-    return e_s*(h/100);
+function e_s(temperature){//The maximum absolute humidity by temperature
+    C1 = 610.94;
+    A1 =  17.625;
+    B1 = 243.04;
+    return C1* Math.exp((A1*temperature)/(B1+temperature));
 }
 
-function to_relative(absolute, t) {
-    C_2 = 2.53 * 1000000000;
-    L = 2.501 * 1000000;
-    R_w = 461.5;
-    e_s =  C_2* Math.exp( (-L)/R_w/(t+273,15));
-    return 100*(absolute/e_s);
+function to_absolute(h, t) {//from relative
+    return e_s(t)*(h/100);
+}
+
+function to_relative(absolute, t) {//from absolute
+    return 100*(absolute/e_s(t));
 }
 
 function temperature_model(t0, t_out0, t, cons){
@@ -103,16 +104,15 @@ function temperature_model(t0, t_out0, t, cons){
 }
 
 function humidity_model(h0, h_out0, t, cons){
-    return (h0-h_out0)*cons[0]/(cons[0] + t**((cons[1]*localStorage["window-size"])/(cons[2]*localStorage["room-size"]))) + h_out0
+    return (h0 -h_out0)*cons[1] /(cons[1] + t**((cons[0]*localStorage["window-size"])/(cons[2]*localStorage["room-size"]))) + h_out0
 }
 
 
 function humidity_over_time_vent(h0, t0, t_out0, h_out0, cons) {
-    var cons = JSON.parse(localStorage["constants_vent"]);
     var absolute = to_absolute(h0, t0);
     var absolute_out = to_absolute(h_out0, t_out0);
 
-    function vent_humidity(t) {
+    function vent_humidity(t) {// function only dependend from time for plotting etc.
         return to_relative(humidity_model(absolute, absolute_out, t, cons), temperature_model(t0, t_out0, t, cons));
 
     };
@@ -141,38 +141,44 @@ function plot_graph(data, destination) {
 function vent() {
     var t0 = document.getElementById('t0').value;
     var h0 = document.getElementById('h0').value;
+
+    if (h0 < 70){
+        alert("Zielbereich bereits erreicht.")
+        return
+    }
+
     h_out = get_weather_data()
+
+    //plotting the graph
     var func = humidity_over_time_vent(h0, t0, localStorage["t_out"], h_out, JSON.parse(localStorage["constants_vent"]));
     plot_graph(x_and_y_values(func, 0, 40, 1), '.vent')
-    i = 0;
-    if (!func(i)){
+    if (!func(1)){
         alert("Etwas ist schief gegangen, wahrscheinlich müssen Sie ihre Daten unter Einstellungen eingeben")
         throw new Error("Returned null")
     }
-    if (h_out >= 65){
-    while (true){
+
+    //getting vent time
+    var answer = "Die Luftfeuchtigkeit fällt auf absehbare Zeit nicht unter möglicherweise schimmelbildende Werte";
+    alert(h_out);
+    if (h_out < 65){ //65 instead of 70 as a safety buffer
+    for (i = 1; i<1000;i++){
+        alert(func(i))
         if (func(i) < 65){
-            vent_time = i;
+            answer = "Sie sollten: " + i + " min lüften.";
             break;
         }
-        if (i >1000){
-            document.getElementById("vent_time").textContent = "Die Luftfeuchtigkeit fällt auf absehbare Zeit nicht unter  Werte";
-        }
-        i++;
-    }document.getElementById("vent_time").textContent = "Sie sollten: " + vent_time + " min lüften.";
-    } else{
-        document.getElementById("vent_time").textContent = "Die Luftfeuchtigkeit fällt auf absehbare Zeit nicht unter möglicherweise schimmelbildende Werte";
-    }
-    
+    }}
+
+    document.getElementById("vent_time").textContent = answer;
 }
 
-function insertAfter(referenceNode, newNode) {
+function insertAfter(referenceNode, newNode) {// by https://stackoverflow.com/questions/4793604/how-to-insert-an-element-after-another-element-in-javascript-without-using-a-lib
     referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
   }
 
 var current_datapoint = 1;
 
-function new_datapoint(){
+function new_datapoint(){//function to add a new datapoint input to the train page
     var keep_data = document.getElementById("keep_data").checked
     var current_data = document.getElementById("current_data").checked
 
@@ -193,7 +199,8 @@ function new_datapoint(){
 }
 
 function train(){
-    temperature = document.getElementById("T_0");
+    //getting the data from the inputs
+    temperature = document.getElementById("T_0").value;
     humidity = [];
     local_time = [];
 
@@ -204,7 +211,7 @@ function train(){
         humidity.push(datapoint.childNodes[3].childNodes[0].childNodes[0].value);
     }
 
-    fnc = function(cons){
+    fnc = function(cons){//sum of error function
         model_prediction = humidity_over_time_vent(humidity[0], temperature, localStorage["t_out"], get_weather_data(), cons);
         sum = 0
         for (var i = 0; i < humidity.length; i++){
@@ -212,8 +219,10 @@ function train(){
         };
         return sum;
     };
-    var solution = optimjs.minimize_Powell(fnc, JSON.parse(localStorage["constants_vent"]));
-    localStorage["constants_vent"] = JSON.stringify(solution["argument"]);
+    //optimizing and storing back
+    var solution = fmin.nelderMead(fnc, JSON.parse(localStorage["constants_vent"]), {maxIterations:20});//Only change the constants slightly
+    console.log(solution);
+    localStorage["constants_vent"] = JSON.stringify(solution.argument);
 
     alert("Das Modell wurde angepasst");
 };

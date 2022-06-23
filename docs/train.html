@@ -14,7 +14,7 @@
     <meta name="msapplication-config" content="favicons/browserconfig.xml">
     <meta name="theme-color" content="#fbf3f3">
     <link rel="stylesheet" href="css/vital.min.css" /> <!-- CSS Framework-->
-    <script src="js/optimization.js"></script>
+    <script src="js/fmin.min.js"></script>
     <script src="js/app.js"></script>
 </head>
 
@@ -34,6 +34,7 @@
     <p>Bitte beachten Sie, wenn Sie die Website schließen ohne das Modell vorher zu trainieren gehen ihre Eingaben verloren</p>
     <p>Bitte pro Training nur ein Duschgang, dann wird der erste Eintrag als h0 bzw. t0 gehandhabt</p>
     <div class="section">
+        <div class="row">
         <div class="full-width-form">
             <div class="col"><label><input placeholder="Temperatur" id="T_0" type="number"></label></div>
             <hr>
@@ -47,6 +48,7 @@
                 <label><input checked="" id="current_data" type="checkbox" onclick="toggle_element_vis('f_weather')">Aktuelle Außendaten verwenden</label>
                 <label><input checked="" id="keep_data" type="checkbox">Daten aus den vorherigen Zeilen für
                     geringere Arbeit übernehmen</label>
+        </div>
         </div>
         <div class="full-width-form" id="f_weather" style="display: none;">
             <p>Wetterdaten</p>
