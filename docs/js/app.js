@@ -149,8 +149,14 @@ function vent() {
 
     h_out = get_weather_data()
 
+    if (t0 < localStorage["t_out"]){
+        t_out = t0 // The model can not handle this due to such cases not being in the trainigsdata. This will use the lowest temperature to assure that at least there is no risk of too high humidity
+    } else{
+        t_out = localStorage["t_out"]
+    }
+
     //plotting the graph
-    var func = humidity_over_time_vent(h0, t0, localStorage["t_out"], h_out, JSON.parse(localStorage["constants_vent"]));
+    var func = humidity_over_time_vent(h0, t0, t_out, h_out, JSON.parse(localStorage["constants_vent"]));
     plot_graph(x_and_y_values(func, 0, 40, 1), '.vent')
     if (!func(1)){
         alert("Etwas ist schief gegangen, wahrscheinlich müssen Sie ihre Daten unter Einstellungen eingeben")
