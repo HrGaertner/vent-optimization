@@ -156,7 +156,6 @@ function vent() {
 
     //plotting the graph
     var func = humidity_over_time_vent(h0, t0, localStorage["t_out"], h_out, JSON.parse(localStorage["constants_vent"]));
-    console.log( func)
     if (!func(1)){
         alert("Etwas ist schief gegangen, wahrscheinlich müssen Sie ihre Daten unter Einstellungen eingeben")
         throw new Error("Returned null")
