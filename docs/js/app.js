@@ -1,5 +1,5 @@
 function set_defaults() {
-    localStorage["constants_vent"] = JSON.stringify([10.22982207, 39.72135881,  0.2509737 , 0.72841352, 11.27604132,  8.1594712 ,  6.73223487]);
+    localStorage["constants_vent"] = JSON.stringify([49.9737675 ,  2.28452262, 49.3679433 ,  8.39747826]);
 }
 
 function toggle_element_vis(elem){
@@ -72,7 +72,7 @@ function get_weather_data() {
         localStorage.removeItem("t_out")
 		fetch_met_no_and_cache();
 	}
-	return item.value
+	return parseFloat(item.value)
 }
 
 function import_settings(File) {
@@ -85,26 +85,26 @@ function import_settings(File) {
 }
 
 function e_s(temperature){//The maximum absolute humidity by temperature
-    C1 = 610.94;
-    A1 =  17.625;
-    B1 = 243.04;
-    return (C1* Math.exp((A1*temperature)/(B1+temperature)))/100 //for unit change;
+    C_1 = 610.94 //Kp
+    A_1 =  17.625
+    B_1 =243.04 //°C
+    return C_1*Math.exp((A_1*temperature)/(B_1+temperature))
 }
 
-function to_absolute(h, t) {//from relative
-    return e_s(t)*(h/100);
+function to_absolute(h, T) {//from relative
+    return (h/100)*e_s(T);
 }
 
-function to_relative(absolute, t) {//from absolute
-    return 100*(absolute/e_s(t));
+function to_relative(absolute, T) {//from absolute
+    return (absolute/e_s(T))*100;
 }
 
-function temperature_model(t0, t_out0, t, cons){
-    return (t0-(t_out0*cons[3]))*cons[4]/(cons[4] + t**(cons[5]/(cons[6]*localStorage["room-size"]))) + (t_out0*cons[3])
+function temperature_model(T0, T_out, t, cons){
+    return (T0-T_out)/((t+1)**((cons[2]*parseFloat(localStorage["window-size"]))/(cons[3]*parseFloat(localStorage["room-size"]))) ) + T_out
 }
 
 function humidity_model(h0, h_out0, t, cons){
-    return (h0 -h_out0)*cons[1] /(cons[1] + t**((cons[0]*localStorage["window-size"])/(cons[2]*localStorage["room-size"]))) + h_out0
+    return (h0 - h_out0)/((t+1)**((cons[0]*parseFloat(localStorage["window-size"]))/(cons[1]*parseFloat(localStorage["room-size"])))) + h_out0
 }
 
 
@@ -126,6 +126,7 @@ function x_and_y_values(func, start, end, steps) {
         x.push(i)
         y.push(func(i))
     }
+    console.log(y)
 
     return [x, y]}
 
@@ -139,8 +140,8 @@ function plot_graph(data, destination) {
 }
 
 function vent() {
-    var t0 = document.getElementById('t0').value;
-    var h0 = document.getElementById('h0').value;
+    var t0 = parseFloat(document.getElementById('t0').value);
+    var h0 = parseFloat(document.getElementById('h0').value);
 
     if (h0 < 70){
         alert("Zielbereich bereits erreicht.")
@@ -149,13 +150,9 @@ function vent() {
 
     h_out = get_weather_data()
 
-    if (t0 <= localStorage["t_out"]){
-       alert("Die Außentemperatur ist höher als die Innentemperatur eine Minimierung des Wärmeverlusts ist nicht notwendig")
-       return
-    }
-
     //plotting the graph
-    var func = humidity_over_time_vent(h0, t0, localStorage["t_out"], h_out, JSON.parse(localStorage["constants_vent"]));
+    var func = humidity_over_time_vent(h0, t0, parseFloat(localStorage["t_out"]), h_out, JSON.parse(localStorage["constants_vent"]));
+    
     if (!func(1)){
         alert("Etwas ist schief gegangen, wahrscheinlich müssen Sie ihre Daten unter Einstellungen eingeben")
         throw new Error("Returned null")
