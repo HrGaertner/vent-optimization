@@ -126,7 +126,6 @@ function x_and_y_values(func, start, end, steps) {
         x.push(i)
         y.push(func(i))
     }
-    console.log(y)
 
     return [x, y]}
 
@@ -221,8 +220,7 @@ function train(){
     };
     //optimizing and storing back
     var solution = fmin.nelderMead(fnc, JSON.parse(localStorage["constants_vent"]), {maxIterations:20});//Only change the constants slightly
-    console.log(solution);
-    localStorage["constants_vent"] = JSON.stringify(solution.argument);
+    localStorage["constants_vent"] = JSON.stringify(solution["x"]);
 
     alert("Das Modell wurde angepasst");
 };
