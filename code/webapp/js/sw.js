@@ -27,7 +27,7 @@ const PRECACHE_URLS = [
   '../favicons/android-chrome-512x512.png',
   '../favicons/android-chrome-192x192.png',
   '../css/vital.min.css',
-  '../css/chartist.min.js',
+  '../css/chartist.min.css',
   'app.js',
   'chartist.min.js',
   'fmin.min.js'
