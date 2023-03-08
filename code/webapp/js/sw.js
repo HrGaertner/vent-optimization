@@ -24,6 +24,8 @@ const PRECACHE_URLS = [
   '../train.html',
   '../favicons/favicon-32x32.png',
   '../favicons/favicon-16x16.png',
+  '../favicons/android-chrome-512x512.png',
+  '../favicons/android-chrome-192x192.png',
   '../css/vital.min.css',
   '../css/chartist.min.js',
   'app.js',
