@@ -19,8 +19,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      working-directory: ./code/PWA
+    defaults:
+      run:
+        working-directory: ${{ env.working-directory }}/code/PWA
 
     steps:
       - uses: actions/checkout@v3
