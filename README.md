@@ -1,5 +1,5 @@
 # vent-optimization
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/HrGaertner/vent-optimization/static-hosting.yml?label=Webapp-hosting&style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/HrGaertner/vent-optimization/deploy.yml?label=Website&style=for-the-badge)
 
 This project develops a model enables the user to minimize the heating loss during airing but ensures to be beneath a certain humidity. This can for example be used to prevent mold. To make the model more usable there is a [WebApp](https://hrgaertner.github.io/vent-optimization/), which besides using the model also allows adapting to the local situation. Furthermore there is a [Home Assistant](https://home-assistant.io) [Integration](https://github.com/HrGaertner/HA-vent-optimization).
 
