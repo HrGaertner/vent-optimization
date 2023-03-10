@@ -45,11 +45,9 @@ jobs:
 
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v1
-        working-directory: ./code/PWA
         with:
-          path: dist/
+          path: ./code/PWA/dist/
 
       - name: Deploy to GitHub Pages
         id: deployment
-        working-directory: ./code/PWA
         uses: actions/deploy-pages@v1
