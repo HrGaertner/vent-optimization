@@ -1,0 +1,55 @@
+name: Deploy the PWA of the submodule to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.13'
+
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ./code/PWA
+
+      - name: Rewrite Service Worker Path in Index
+        run: sed -i 's@/sw.js@${{ github.event.repository.name }}/sw.js@g' ./index.html && cat ./index.html
+        working-directory: ./code/PWA
+
+      - name: Replace Paths in Manifest
+        run: sed -i 's@"/"@"/${{ github.event.repository.name }}/"@g' ./public/manifest.json && cat ./public/manifest.json
+        working-directory: ./code/PWA
+
+      - name: Vite Build
+        run: npm run build -- --base=${{ github.event.repository.name }}
+        working-directory: ./code/PWA
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v1
+        working-directory: ./code/PWA
+        with:
+          path: dist/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        working-directory: ./code/PWA
+        uses: actions/deploy-pages@v1
