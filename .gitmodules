@@ -1,0 +1,6 @@
+[submodule "code/PWA"]
+	path = code/PWA
+	url = https://github.com/HrGaertner/pwa-vent-optimization
+[submodule "code/HomeAssistant-Integration"]
+	path = code/HomeAssistant-Integration
+	url = https://github.com/HrGaertner/ha-vent-optimization

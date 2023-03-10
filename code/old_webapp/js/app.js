@@ -144,7 +144,6 @@ function vent() {
 
     if (h0 < 70){
         alert("Zielbereich bereits erreicht.")
-        return
     }
 
     h_out = get_weather_data()
