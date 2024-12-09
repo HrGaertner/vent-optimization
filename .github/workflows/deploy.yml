@@ -52,7 +52,7 @@ jobs:
         run: npm run build -- --base=${{ github.event.repository.name }}
 
       - name: Upload Artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./code/PWA/dist/
 
